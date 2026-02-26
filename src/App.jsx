@@ -1,4 +1,4 @@
-import { createBrowserRouter, RouterProvider } from "react-router-dom"
+import { createHashRouter, RouterProvider } from "react-router-dom"
 import Home from "./components/home/Home"
 import Login from "./components/login/Login"
 import Signup from './components/signup/Signup';
@@ -17,7 +17,7 @@ import {QueryClientProvider , QueryClient} from "@tanstack/react-query";
 import MyData from "./context/MyData";
 
 
-let router = createBrowserRouter([
+let router = createHashRouter([
   {path:"" , element:<ProtectedRoutes> <LayoutHome/> </ProtectedRoutes>   ,children:[
     {index:true , element: <Home/>},
     {path:"home" , element: <Home/>},
