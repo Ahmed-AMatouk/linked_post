@@ -10,7 +10,7 @@ import Massages from "./components/Massages/Massages";
 import Notice from "./components/Notice/Notice";
 import AuthContext from "./context/AuthContext";
 import ProtectedRoutes from "./components/ProtectedRoutes/ProtectedRoutes";
-import AuthRoute from "./components/authRoute/AuthRoute";
+import AuthRoute from "./components/AuthRoute/AuthRoute";
 import Notfound from "./components/notfound/Notfound";
 import PostDetails from "./components/posts/PostDetails";
 import {QueryClientProvider , QueryClient} from "@tanstack/react-query";
