@@ -6,7 +6,7 @@ import { QueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { useContext, useState } from "react";
 import { Card, Skeleton } from "@heroui/react";
-import MyPosts from "../posts/myPosts";
+import MyPosts from "../posts/MyPosts";
 import { authContext } from "../../context/AuthContext";
 import { MyDataContext } from "../../context/MyData";
 export default function Profile() {
