@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react'
+import { FaArrowRight } from "react-icons/fa6";
 import { FaHome, FaUser } from 'react-icons/fa';
 import { IoChatbubble, IoNotifications} from "react-icons/io5";
 import { IoMdPersonAdd } from "react-icons/io";
@@ -7,6 +8,7 @@ import { FaArrowTrendUp } from "react-icons/fa6";
 import { Link, Navigate, NavLink, Outlet , useLocation, useNavigate } from 'react-router-dom';
 import { authContext } from '../../context/AuthContext';
 import { MyDataContext } from '../../context/MyData';
+import { Skeleton } from '@heroui/react';
 
 export default function LayoutHome() {
     const location = useLocation();
@@ -20,16 +22,16 @@ export default function LayoutHome() {
         settoken(null)
         nav("/register/login")
     }
-
     
+    const [detectArrow, setdetectArrow] = useState(true)
     return (
         <div className="min-h-screen bg-gray-100 flex">
 
             {/* LEFT SIDEBAR */}
-            <aside className="lg:w-64 bg-white shadow-sm p-3 lg:p-6 flex flex-col justify-between sticky bottom-0 top-0 left-0 h-screen">
-
+            <aside className={`${detectArrow ?"-translate-x-full":""} lg:translate-x-0 lg:w-64 bg-white shadow-sm p-3 lg:p-6 flex flex-col justify-between fixed lg:sticky z-50 bottom-0 top-0 left-0 h-screen`}>
+                <FaArrowRight onClick={() => setdetectArrow(!detectArrow)} className='lg:hidden box-content px-2 py-1 rounded-e-full hover:bg-blue-500 duration-200 cursor-pointer bg-blue-300 absolute top-4 -right-8 text-white'/>
                 <div>
-                    <Link to={"/home"} end>
+                    <Link to={"/home"}>
                         <header className='mb-10'>
                             <h1>
                             <div className='flex gap-3 items-center'>
@@ -93,14 +95,24 @@ export default function LayoutHome() {
                 </div>
 
                 <div>
+                    
+                    
                     <div className="flex items-center gap-3 mb-6">
-                        <img
+                            {!user?.photo?
+                            <div>
+                                <Skeleton className="flex rounded-full w-12 h-12" />
+                            </div>
+                            :
+                            <img
                             src={user?.photo}
                             className="w-12 h-12 rounded-full object-cover"
-                        />
+                            />
+                            
+                            }
+                        
                         <div className='hidden lg:block'>
-                            <p className="font-medium">{user?.name}</p>
-                            <p className="text-sm text-gray-500">@{user?.username}</p>
+                            <p className="font-medium">{user&&user.name}</p>
+                            <p className="text-sm text-gray-500">@{user&&user.username}</p>
                         </div>
                     </div>
 

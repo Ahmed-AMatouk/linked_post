@@ -19,16 +19,14 @@ export default function MyPosts() {
         queryFn:getMyPosts,
       })
 
-        let posts = data?.data?.data?.posts || []
-      console.log(posts);
-      
+        let posts = data?.data?.data?.posts || []      
   
-    if(posts.length === 0) return <p className='text-center text-gray-500'>No Posts Yet</p>
+    if(data && posts.length === 0) return <p className='text-center text-gray-500'>No Posts Yet</p>
     return (
         <div className="text-start">
 
             {
-            isLoading || isFetching ? 
+            isLoading ? 
              <Card className="w-full h-100 space-y-5 p-4" radius="lg">
               <Skeleton className="rounded-lg">
                 <div className="h-24 rounded-lg bg-default-300" />

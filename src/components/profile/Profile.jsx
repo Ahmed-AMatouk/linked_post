@@ -2,19 +2,24 @@ import { Link } from "react-router";
 import { Settings, Calendar, ArrowLeft } from "lucide-react";
 import { IoCamera } from "react-icons/io5";
 import { Button } from "@heroui/button";
-import { QueryClient } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import axios from "axios";
-import { useContext, useState } from "react";
+import { useContext, useRef, useState } from "react";
 import { Card, Skeleton } from "@heroui/react";
 import MyPosts from "../posts/MyPosts";
 import { authContext } from "../../context/AuthContext";
 import { MyDataContext } from "../../context/MyData";
+import { toast } from "react-toastify";
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("posts");
   let {token} = useContext(authContext)
-  let {user, isLoading, isFetching , refetch} = useContext(MyDataContext)
+  let {user, isLoading , refetch} = useContext(MyDataContext)
+  const inputRef = useRef(null);
+  
 
-  function uploadProfilePhoto(file) {
+function uploadProfilePhoto() {
+  const file = inputRef.current.files[0];
+  if (!file) return;
   const formData = new FormData();
   formData.append("photo", file);
 
@@ -28,27 +33,26 @@ export default function Profile() {
     }
   );
 }
-
-async function handlePhotoChange(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  try {
-    await uploadProfilePhoto(file);
-    alert("Photo Updated ✅");
+let {isPending, mutate} = useMutation({
+  mutationFn:uploadProfilePhoto,
+  onSuccess:()=>{
+    toast.success("Profile photo uploaded ✅",{position:"top-right"})
     refetch()
-  } catch (error) {
-    console.log(error);
-    alert("Upload failed ❌");
+  },
+  onError:()=>{
+    toast.error("Failed to upload profile photo ❌")
   }
-}
+})
+
+
+
   
   
  
   return (
     <div className='flex-1 p-8 '>
     {
-    isLoading || isFetching ?
+    isLoading ?
       <Card className="w-full h-100 space-y-5 p-4" radius="lg">
               <Skeleton className="rounded-lg">
                 <div className="h-24 rounded-lg bg-default-300" />
@@ -95,7 +99,7 @@ async function handlePhotoChange(e) {
               className="flex items-center gap-2 text-gray-700 mb-4 hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span>Back to feed</span>
+              <span>Back to Home</span>
             </Link>
 
             {/* Profile Header */}
@@ -116,13 +120,18 @@ async function handlePhotoChange(e) {
               <div className="relative px-6 pb-6">
                 <div className="flex justify-between items-start -mt-16 mb-4 ">
                   <div className="relative">
-                    <img
-                    src={user.photo}
-                    alt={user.name}
-                    className="w-32 h-32 rounded-full object-cover ring-4 ring-white shadow-xl"
-                  />
+                    {
+                      isPending?
+                      <Skeleton className="flex rounded-full w-32 h-32" />
+                      :
+                      <img
+                        src={user.photo}
+                        alt={user.name}
+                        className="w-32 h-32 rounded-full object-cover ring-4 ring-white shadow-xl"
+                      />
+                    }
                   <div className="p-2 rounded-full bg-white text-gray-700 shadow-md absolute bottom-5 right-5 translate-x-1/2 translate-y-1/2 cursor-pointer hover:bg-gray-100 transition-colors">
-                    <input onChange={handlePhotoChange} type="file" className="hidden" id="profile-upload" />
+                    <input onChange={mutate} ref={inputRef} type="file" className="hidden" id="profile-upload" />
                     <label htmlFor="profile-upload"><IoCamera className="text-xl cursor-pointer"/></label>
                   </div>
                   

@@ -1,49 +1,50 @@
 import axios from 'axios';
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { authContext } from '../../context/AuthContext';
 import { PostCard } from './PostCard';
 import { Card, Skeleton } from '@heroui/react';
 import { ArrowLeft } from 'lucide-react';
 import { Link } from "react-router";
+import { useQuery } from '@tanstack/react-query';
 
 export default function PostDetails() {
     const { id } = useParams();
-    const [post, setPost] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [comments, setComments] = useState([]);
     let {token} = useContext(authContext)
 
-    async function getPostDetails() {
-        try {
-            setLoading(true);
-            let { data } = await axios.get(
+    function getPostDetails() {
+            return axios.get(
             `https://route-posts.routemisr.com/posts/${id}`,{
                 headers:{
                 Authorization: `Bearer ${token}`
                 }
             });
-        setPost(data.data.post);
-        setLoading(false);
-        } catch (error) {
-        console.log(error);
-        }
+        
     }
-    async function getComment() {
-        let {data} = await axios.get(`https://route-posts.routemisr.com/posts/${id}/comments`,{
+    let {data, isLoading} = useQuery({
+        queryKey:["postDetails", id],
+        queryFn:getPostDetails,
+        
+    })
+    let post = data?.data?.data?.post || null
+    let loading = isLoading
+
+
+
+
+    function getComment() {
+        return axios.get(`https://route-posts.routemisr.com/posts/${id}/comments`,{
             headers:{
                 Authorization: `Bearer ${token}`
             }
         })
-        setComments(data.data.comments)
     }
 
-    useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        getPostDetails();
-        getComment()
-    }, []);
-    console.log(comments);
+    let {data:comments} = useQuery({
+        queryKey:["comments", id],
+        queryFn:getComment,
+    })
+    let commentsArray = comments?.data?.data?.comments || []
     
   return (
     <div className="m-6 flex-1 p-8">
@@ -52,7 +53,7 @@ export default function PostDetails() {
               className="flex items-center gap-2 text-gray-700 mb-4 hover:text-primary transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
-              <span>Back to feed</span>
+              <span>Back to Home</span>
             </Link>
         {
         loading?
@@ -91,7 +92,7 @@ export default function PostDetails() {
               </div>
             </Card>
         :
-            post && <PostCard post={post} comments={comments} />}
+            post && <PostCard post={post} comments={commentsArray} />}
     </div>
     
   )

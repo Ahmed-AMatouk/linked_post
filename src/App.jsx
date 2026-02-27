@@ -15,6 +15,7 @@ import Notfound from "./components/notfound/Notfound";
 import PostDetails from "./components/posts/PostDetails";
 import {QueryClientProvider , QueryClient} from "@tanstack/react-query";
 import MyData from "./context/MyData";
+import { ToastContainer } from "react-toastify";
 
 
 let router = createHashRouter([
@@ -45,7 +46,8 @@ export default function App() {
         <MyData>
 
 
-            <RouterProvider router={router}></RouterProvider>
+          <RouterProvider router={router} />
+          <ToastContainer />
 
         </MyData>
           </AuthContext>
