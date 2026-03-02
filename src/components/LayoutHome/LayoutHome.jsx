@@ -12,10 +12,10 @@ import { Skeleton } from '@heroui/react';
 
 export default function LayoutHome() {
     const location = useLocation();
-    let nav = useNavigate()
     const {user} = useContext(MyDataContext)
-    const {settoken} = useContext(authContext)
     let [follow, setfollow] = useState("")
+    let nav = useNavigate()
+    const {settoken} = useContext(authContext)
     
     function logout(){
         localStorage.removeItem("token")
@@ -28,8 +28,8 @@ export default function LayoutHome() {
         <div className="min-h-screen bg-gray-100 flex">
 
             {/* LEFT SIDEBAR */}
-            <aside className={`${detectArrow ?"-translate-x-full":""} lg:translate-x-0 lg:w-64 bg-white shadow-sm p-3 lg:p-6 flex flex-col justify-between fixed lg:sticky z-50 bottom-0 top-0 left-0 h-screen`}>
-                <FaArrowRight onClick={() => setdetectArrow(!detectArrow)} className='lg:hidden box-content px-2 py-1 rounded-e-full hover:bg-blue-500 duration-200 cursor-pointer bg-blue-300 absolute top-4 -right-8 text-white'/>
+            <aside className={`${detectArrow ?"-translate-x-full":""} md:translate-x-0 lg:w-64 bg-white shadow-sm p-3 lg:p-6 flex flex-col justify-between fixed md:sticky z-50 bottom-0 top-0 left-0 h-screen`}>
+                <FaArrowRight onClick={() => setdetectArrow(!detectArrow)} className='md:hidden box-content px-2 py-1 rounded-e-full hover:bg-blue-500 duration-200 cursor-pointer bg-blue-300 absolute top-4 -right-8 text-white'/>
                 <div>
                     <Link to={"/home"}>
                         <header className='mb-10'>
@@ -132,7 +132,7 @@ export default function LayoutHome() {
 
 
             {/* RIGHT SIDEBAR */}
-            <aside className="w-96 bg-gray-100 p-6 space-y-6 sticky top-0 bottom-0 h-screen right-0 hidden lg:block">
+            <aside className="w-96 bg-gray-100 p-6 space-y-6 sticky top-0 bottom-0 h-screen right-0 hidden xl:block">
 
                 {/* Suggested */}
                 <div className="bg-white rounded-2xl shadow-sm p-4">

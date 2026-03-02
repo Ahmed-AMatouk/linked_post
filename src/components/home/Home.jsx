@@ -41,8 +41,7 @@ export default function Home() {
     
     function creatUrlImage(e){
       let imgPath  = URL.createObjectURL(e.target.files[0])
-      setimgUrl(imgPath)
-      
+      setimgUrl(imgPath) 
     }
     function clearImg(){
       setimgUrl(null)

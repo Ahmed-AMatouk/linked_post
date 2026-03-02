@@ -16,6 +16,7 @@ import PostDetails from "./components/posts/PostDetails";
 import {QueryClientProvider , QueryClient} from "@tanstack/react-query";
 import MyData from "./context/MyData";
 import { ToastContainer } from "react-toastify";
+import { Offline } from "react-detect-offline";
 
 
 let router = createHashRouter([
@@ -46,9 +47,11 @@ export default function App() {
         <MyData>
 
 
-          <RouterProvider router={router} />
-          <ToastContainer />
-
+            <RouterProvider router={router} />
+            <ToastContainer />
+          <Offline className="fixed top-0 left-0 w-full bg-red-500 text-white text-center p-2 z-60">
+            <p>You are currently offline. Please check your internet connection.</p>
+          </Offline>
         </MyData>
           </AuthContext>
       </HeroUIProvider>
