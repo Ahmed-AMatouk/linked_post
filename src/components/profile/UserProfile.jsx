@@ -8,7 +8,7 @@ import { Alert, Card, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader, 
 import MyPosts from "../posts/MyPosts";
 import { MyDataContext } from "../../context/MyData";
 import { Circles } from "react-loader-spinner";
-import Bookmark from "../posts/bookmark";
+import Bookmark from "../posts/Bookmark";
 import axios from "axios";
 import { authContext } from "../../context/AuthContext";
 import UserPosts from "../posts/UserPosts";
