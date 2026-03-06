@@ -14,7 +14,7 @@ import { Circles } from "react-loader-spinner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import Bookmark from "../posts/bookmark";
+import Bookmark from "../posts/Bookmark";
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("posts");
   let { token , settoken } = useContext(authContext)
