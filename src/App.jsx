@@ -17,6 +17,7 @@ import {QueryClientProvider , QueryClient} from "@tanstack/react-query";
 import MyData from "./context/MyData";
 import { ToastContainer } from "react-toastify";
 import { Offline } from "react-detect-offline";
+import UserProfile from "./components/profile/UserProfile";
 
 
 let router = createHashRouter([
@@ -25,6 +26,7 @@ let router = createHashRouter([
     {path:"home" , element: <Home/>},
     {path:"post/:id" , element: <PostDetails/>},
     {path:"profile" , element: <Profile/>},
+    {path:"user/:id" , element: <UserProfile/>},
     {path:"massages" , element: <Massages/>},
     {path:"notice" , element: <Notice/>}
     

@@ -5,23 +5,20 @@ import { useQuery } from '@tanstack/react-query'
 import { Card, Skeleton } from '@heroui/react'
 import { PostCard } from './PostCard'
 
-export default function MyPosts() {
-    // https://route-posts.routemisr.com/posts/feed
-
+export default function Bookmark() {
+    
+    
     let {token} = useContext(authContext)
-      function getMyPosts(){
-        return axios.get("https://route-posts.routemisr.com/posts/feed",{
+    function getBookmarkedPosts(){
+        return axios.get("https://route-posts.routemisr.com/users/bookmarks",{
           headers:{Authorization: `Bearer ${token}`}})
-      }
-      
-      let {data , isLoading} = useQuery({
-        queryKey:["myPosts"],
-        queryFn:getMyPosts,
+    }
+    let {data , isLoading} = useQuery({
+        queryKey:["bookmarks"],
+        queryFn:getBookmarkedPosts,
       })
-
-        let posts = data?.data?.data?.posts || []      
-  
-    if(data && posts.length === 0) return <p className='text-center text-gray-500'>No Posts Yet</p>
+    let bookmerkedPosts = data?.data?.data?.bookmarks || []
+    if(data && bookmerkedPosts.length === 0) return <p className='text-center text-gray-500'>No Bookmerked Posts Yet</p>
     return (
         <div className="text-start">
 
@@ -63,7 +60,7 @@ export default function MyPosts() {
             </Card>
           :
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden my-5 p-4">
-              {posts?.map((post) => (
+              {bookmerkedPosts?.map((post) => (
                 <div key={post._id} className="my-4">
                   <PostCard 
                     post={post} 
@@ -76,8 +73,5 @@ export default function MyPosts() {
             </div>
             }
         </div>
-          
-          
-        
   )
 }

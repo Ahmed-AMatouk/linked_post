@@ -14,6 +14,7 @@ import { Circles } from "react-loader-spinner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import Bookmark from "../posts/bookmark";
 export default function Profile() {
   const [activeTab, setActiveTab] = useState("posts");
   let { token , settoken } = useContext(authContext)
@@ -85,7 +86,35 @@ export default function Profile() {
     }
   }
 
+  
 
+  let coverPhoto = useRef(null)
+  function uploadCoverPhoto() {
+    const file = coverPhoto.current.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("cover", file);
+
+    return axios.put(
+      "https://route-posts.routemisr.com/users/upload-cover",
+      formData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+  }
+  let { isPending:isPendingCover, mutate:mutateCover } = useMutation({
+    mutationFn: uploadCoverPhoto,
+    onSuccess: () => {
+      toast.success("Cover photo uploaded ✅", { position: "top-right" })
+      refetch()
+    },
+    onError: () => {
+      toast.error("Failed to upload Cover photo ❌")
+    }
+  })
 
 
 
@@ -147,13 +176,19 @@ export default function Profile() {
 
                     {/* Cover */}
                     <div className="relative h-48 bg-linear-to-r from-primary to-blue-600">
-                      {user?.cover &&
+                      {isPendingCover ?
+                        <Skeleton className="flex w-full h-full" />
+                      :
                         <img
                           src={user.cover}
                           alt="Cover"
                           className="w-full h-full object-cover"
                         />
                       }
+                      <div className="p-2 rounded-full bg-white text-gray-700 shadow-md absolute bottom-5 right-5 z-50 translate-x-1/2 translate-y-1/2 cursor-pointer hover:bg-gray-100 transition-colors">
+                        <input onChange={mutateCover} ref={coverPhoto} type="file" className="hidden" id="cover-upload" />
+                        <label htmlFor="cover-upload"><IoCamera className="text-xl cursor-pointer" /></label>
+                      </div>
                     </div>
 
                     {/* Info */}
@@ -333,7 +368,7 @@ export default function Profile() {
 
                   {activeTab === "bookmarks" && (
                     <div className="p-6 text-center text-gray-500">
-                      bookmark Content
+                      <Bookmark/>
                     </div>
                   )}
 

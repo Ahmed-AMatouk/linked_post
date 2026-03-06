@@ -16,7 +16,7 @@ import { Circles } from "react-loader-spinner";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
-export function PostCard({ post, comments }) {
+export function PostCard({ post, comments ,isShared}) {
 
   let { user } = useContext(MyDataContext)
   let queryClient = useQueryClient()
@@ -56,7 +56,8 @@ export function PostCard({ post, comments }) {
   let postbodyinput = useRef(null)
   let postimageinput = useRef(null)
   const [imgUrl, setimgUrl] = useState(post.image)
-  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  let { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { isOpen:isSharedOpen, onOpen: onSharedOpen, onOpenChange:onShareChange } = useDisclosure();
   const formData = new FormData();
   function updatePost() {
     let body = postbodyinput.current?.value
@@ -90,19 +91,17 @@ export function PostCard({ post, comments }) {
     setimgUrl(imgPath)
   }
 
-
-
   function deletePost() {
     const MySwal = withReactContent(Swal);
-  MySwal.fire({
-  title: "Are you sure?",
-  text: "You won't be able to revert this!",
-  icon: "warning",
-  showCancelButton: true,
-  confirmButtonColor: "#3085d6",
-  cancelButtonColor: "#d33",
-  confirmButtonText: "Yes, delete it!"
-}).then((result) => {
+    MySwal.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Yes, delete it!"
+  }).then((result) => {
   if (result.isConfirmed) {
     try {
       axios.delete(`https://route-posts.routemisr.com/posts/${post._id}`, {
@@ -122,13 +121,71 @@ export function PostCard({ post, comments }) {
 });
   }
 
+  const isLiked = post.likes.some(
+  like => like === user._id
+  )
+  const [likeState, setlikeState] = useState(isLiked)
+  const [likesCount, setlikesCount] = useState(post.likesCount)
+  async function handleLike(){
+    try {
+      setlikeState(prev => !prev)
+      setlikesCount(prev => prev + (likeState ? -1 : 1))
+      await axios.put(`https://route-posts.routemisr.com/posts/${post._id}/like` , {} ,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      queryClient.invalidateQueries(["posts"])
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  }  
+  
+  const [bookmark, setBookmark] = useState(post.bookmarked)
+  async function handleBookmark(){
+    try {
+      
+      setBookmark(prev => !prev)
+      await axios.put(`https://route-posts.routemisr.com/posts/${post._id}/bookmark` , {} ,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      queryClient.invalidateQueries(["posts"])
+    } catch (error) {
+      console.log(error.response.data.message);
+    }
+  }
+
+  let sharedPostBody = useRef(null)
+  const [shareLoading, setshareLoading] = useState(false)
+  async function handleShare(){
+    try {
+      setshareLoading(true)
+      await axios.post(`https://route-posts.routemisr.com/posts/${post._id}/share` , {body:sharedPostBody.current.value} ,{
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      setshareLoading(false)
+      queryClient.invalidateQueries(["posts"])
+      toast.success("Post Shared successfully ✅", { position: "top-right" })
+      onShareChange(false)
+    } catch (error) {
+      console.log(error);
+     toast.error("Failed to Share post ❌") 
+    }
+
+  }
+
+
   return (
 
     <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300 border border-gray-100/50">
 
       {/* User header */}
       <div className="flex items-center gap-3 p-4">
-        <Link to={`/profile/${post.user.name}`} className="flex items-center gap-3">
+        <Link to={`/user/${post.user._id}`} className="flex items-center gap-3">
           {!post.user.photo ?
             <div>
               <Skeleton className="flex rounded-full w-10 h-10" />
@@ -147,7 +204,7 @@ export function PostCard({ post, comments }) {
 
         <div className="flex-1">
           <Link
-            to={`/profile/${post.user.name}`}
+            to={`/user/${post.user._id}`}
             className="hover:text-primary transition-colors"
           >
             <p className="text-gray-900 inline font-bold">
@@ -237,15 +294,24 @@ export function PostCard({ post, comments }) {
 
 
       </div>
-
+      
       {/* Post body */}
-      {post.body &&
+      {
+      (post.body &&
         <div className="px-4 pb-2">
           <p className="text-gray-800">{post.body}</p>
-        </div>}
+        </div>)}
+
+      {post.isShare &&
+        <div className="m-4 mt-0 rounded-2xl border border-gray-200 ">
+          <PostCard post={post.sharedPost} comments={[]} isShared={true}/>
+        </div>
+      }
 
       {/* Post image */}
-      {post.image &&
+      {
+      post.isShare ||
+      (post.image &&
         <div className="relative w-full bg-gray-100">
           <Image
             isBlurred
@@ -255,10 +321,11 @@ export function PostCard({ post, comments }) {
             src={post.image}
           />
 
-        </div>
+        </div>)
       }
 
       {/* Actions */}
+      
       <div className="p-4 space-y-3">
         <div className="flex items-start gap-8 relative borderbottom border-gray-100 pb-4">
           <button
@@ -267,13 +334,14 @@ export function PostCard({ post, comments }) {
           >
             <div className="">
               <Heart
-                className={`w-6 h-6 transition-colors ${post.likesCount
+              onClick={handleLike}
+                className={`cursor-pointer w-6 h-6 transition-colors ${likeState
                   ? "fill-red-500 text-red-500"
                   : "text-gray-700 hover:text-red-500"
                   }`}
               />
               <p className="font-medium text-gray-500 text-sm">
-                {post.likesCount}
+                {likesCount}
               </p>
             </div>
           </button>
@@ -284,22 +352,74 @@ export function PostCard({ post, comments }) {
               <p className="text-sm text-gray-500 p-1.5">{CommentCount}</p>
             </div>
           </Link>
+          {
+            !post.isShare ?
+            (<>
+                  <Link onClick={onSharedOpen} className="flex items-center gap-2 transition-all duration-200 hover:scale-110">
+                  <div className="">
+                    <Share2 className="w-6 h-6 text-gray-700 hover:text-primary" />
+                    <p className="text-sm text-gray-500">Share</p>
+                  </div>
+                </Link>
+                <Modal onOpenChange={onShareChange} isOpen={isSharedOpen} onShareChange={(isOpen) => {
+                if (!isOpen) {
+                  setimgUrl(post.image)
+                  postimageinput.current.value = null
+                }
+                onShareChange(isOpen)
+              }}>
+                <ModalContent>
+                  {(onClose) => (
+                    <>
+                      {/* <img src={user.photo} alt="User Photo" className=" w-40 h-40 object-cover rounded-full" /> */}
+                      <ModalHeader className="text-gray-400 text-3xl mb-4 mt-1 px-4">
+                        Shared Post
+                      </ModalHeader>
+                      <ModalBody >
+                        <textarea ref={sharedPostBody} placeholder="What's on your mind?" name="newpost" className="focus:ring-2 outline-none focus:ring-blue-400 w-full h-40 p-2 border border-gray-200 rounded-lg"></textarea>
+                      </ModalBody>
+                      <ModalFooter>
+                        <Button color="danger" variant="light" onPress={() => onClose()}>
+                          Close
+                        </Button>
+                        <Button className={`${shareLoading ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"}`} color="primary" onPress={handleShare} disabled={shareLoading}>
+                          {
+                            <Circles
+                              height="20"
+                              width="20"
+                              color="#fff"
+                              ariaLabel="circles-loading"
+                              wrapperStyle={{}}
+                              wrapperClass=""
+                              visible={shareLoading}
+                            />
 
-          <Link className="flex items-center gap-2 transition-all duration-200 hover:scale-110">
-            <div className="">
-              <Share2 className="w-6 h-6 text-gray-700 hover:text-primary" />
-              <p className="text-sm text-gray-500">Share</p>
-            </div>
-          </Link>
+                          }
+                          {!shareLoading && "Share"}
+                        </Button>
+                      </ModalFooter>
+                    </>
+                  )}
+                </ModalContent>
+              </Modal>
+            </>)
+            :
+            ""
+          }
+          
+          
 
-          <button className="flex items-center gap-2 ml-auto transition-all duration-200 hover:scale-110">
-            <Bookmark className="w-6 h-6 text-gray-700 hover:text-emerald-500" />
+          <button onClick={handleBookmark} className="flex items-center gap-2 ml-auto transition-all duration-200 hover:scale-110">
+            
+            <Bookmark className={`cursor-pointer w-6 h-6 ${bookmark?"text-emerald-500 fill-emerald-500":"text-gray-700 hover:text-emerald-500"} `} />
           </button>
 
         </div>
 
         {/* create comment */}
-        <div className="flex items-center gap-2 mb-6">
+        
+        { !isShared ?
+        (<div className="flex items-center gap-2 mb-6">
           {!user?.photo ?
             <div>
               <Skeleton className="flex rounded-full w-12 h-12" />
@@ -329,11 +449,14 @@ export function PostCard({ post, comments }) {
                 <FaArrowRightLong />
               </button>
           }
-        </div>
+        </div>):""
+        }
 
 
         {/* comments */}
-        {comments ? comments.map((comment) => (
+      {
+      !isShared ?
+        (<>{comments ? comments.map((comment) => (
           <Comment key={comment._id} comment={comment} postId={post._id} />
         )) :
           <Card className="w-full h-100 space-y-5 p-4" radius="lg">
@@ -359,8 +482,8 @@ export function PostCard({ post, comments }) {
             <Link to={`/post/${post._id}`} className="text-gray-500 text-sm hover:text-gray-700 cursor-pointer">
               View all comments
             </Link> : ""
-        }
-
+        }</>):""
+      }
 
       </div>
     </div>
