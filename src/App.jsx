@@ -51,8 +51,8 @@ export default function App() {
 
             <RouterProvider router={router} />
             <ToastContainer />
-          <Offline className="fixed top-0 left-0 w-full bg-red-500 text-white text-center p-2 z-60">
-            <p>You are currently offline. Please check your internet connection.</p>
+          <Offline>
+            <p className="bg-red-500 text-white text-center p-1 fixed top-0 left-0 w-full z-60">You are currently offline. Please check your internet connection.</p>
           </Offline>
         </MyData>
           </AuthContext>

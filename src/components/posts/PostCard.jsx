@@ -17,11 +17,11 @@ import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
 export function PostCard({ post, comments ,isShared}) {
-
   let { user } = useContext(MyDataContext)
   let queryClient = useQueryClient()
   const [newComment, setNewComment] = useState("");
-  const [CommentCount, setCommentCount] = useState(post.commentsCount);
+  const [CommentCount, setCommentCount] = useState(post?.commentsCount);
+  let { token } = useContext(authContext)
   const date = new Date(post.createdAt);
   const formattedDate = date.toLocaleString("en-US", {
     year: "numeric",
@@ -31,7 +31,6 @@ export function PostCard({ post, comments ,isShared}) {
     minute: "2-digit",
   });
 
-  let { token } = useContext(authContext)
   function sendComment() {
     setNewComment("");
     return axios.post(

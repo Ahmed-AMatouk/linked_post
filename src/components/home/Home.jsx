@@ -41,7 +41,8 @@ export default function Home() {
     
     function creatUrlImage(e){
       let imgPath  = URL.createObjectURL(e.target.files[0])
-      setimgUrl(imgPath) 
+      setimgUrl(imgPath)
+      
     }
     function clearImg(){
       setimgUrl(null)
@@ -70,18 +71,17 @@ export default function Home() {
           
         } catch (error) {
           console.log(error);
-          
           setlaodingnewpost(false)
           toast.error("Failed to create post ❌",{position:"top-right"})
         }
         
         
     }
- 
+
   return (
     <>
     
-      <main className="flex-1 lg:p-8 p-2">
+      <main className="flex-1 lg:p-8 p-2 min-w-0">
 
         {/* Create Post */}
         <div className="bg-white rounded-2xl shadow-sm p-4 flex items-center gap-4 mb-6">
